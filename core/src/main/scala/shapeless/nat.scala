@@ -44,7 +44,7 @@ case class Succ[P <: Nat]() extends Nat {
  *
  * @author Miles Sabin
  */
-class _0 extends Nat {
+class _0 extends Nat with Serializable {
   type N = _0
 }
 

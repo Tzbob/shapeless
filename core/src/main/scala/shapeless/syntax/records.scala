@@ -25,7 +25,7 @@ import tag.@@
  * 
  * @author Miles Sabin
  */
-final class RecordOps[L <: HList](l : L) {
+final class RecordOps[L <: HList](l : L) extends Serializable {
   import shapeless.labelled._
   import ops.record._
 

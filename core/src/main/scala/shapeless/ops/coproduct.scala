@@ -373,7 +373,7 @@ object coproduct {
         }
   }
 
-  trait ZipWithKeys[K <: HList, V <: Coproduct] extends DepFn1[V] { type Out <: Coproduct }
+  trait ZipWithKeys[K <: HList, V <: Coproduct] extends DepFn1[V] with Serializable { type Out <: Coproduct }
 
   object ZipWithKeys {
     import shapeless.labelled._

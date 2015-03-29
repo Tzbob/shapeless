@@ -203,7 +203,7 @@ object Sized extends LowPrioritySized {
  *
  * @author Alexandre Archambault
  */
-trait AdditiveCollection[Repr]
+trait AdditiveCollection[Repr] extends Serializable
 
 object AdditiveCollection {
   import scala.collection.immutable.Queue

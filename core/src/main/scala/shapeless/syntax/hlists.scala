@@ -27,7 +27,7 @@ import scala.annotation.tailrec
  *
  * @author Miles Sabin
  */
-final class HListOps[L <: HList](l : L) {
+final class HListOps[L <: HList](l : L) extends Serializable {
   import ops.hlist._
 
   /**

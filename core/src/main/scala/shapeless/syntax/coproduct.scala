@@ -25,7 +25,7 @@ package syntax
  *
  * @author Miles Sabin
  */
-final class CoproductOps[C <: Coproduct](c: C) {
+final class CoproductOps[C <: Coproduct](c: C) extends Serializable {
   import ops.coproduct._
 
   /**
