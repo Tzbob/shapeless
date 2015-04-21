@@ -43,8 +43,31 @@ class SingletonTypesTests {
   val wBar = Witness('bar)
   type Bar = wBar.T
 
+  object Quux
+  object Corge
+
+  val wQuux = Witness(Quux)
+  type QuuxT = wQuux.T
+  val wCorge = Witness(Corge)
+  type CorgeT = wCorge.T
+
+  class Baz
+  val baz = new Baz
+  val wBaz = Witness(baz)
+  type BazT = wBaz.T
+
+  val x: BazT = wBaz.value
+  val y: BazT = baz
+
+  trait Qux
+  val qux = new Qux {}
+
+  val wQux = Witness(qux)
+  type QuxT = wQux.T
+
   @Test
   def testRefine {
+
     val sTrue = true.narrow
     val sFalse = false.narrow
 
@@ -53,7 +76,9 @@ class SingletonTypesTests {
 
     illTyped("""
       sameTyped(sTrue)(sFalse)
-      sameTyped(sTrue)(false)
+    """)
+    illTyped("""
+       sameTyped(sTrue)(false)
     """)
 
     val s13 = 13.narrow
@@ -64,6 +89,8 @@ class SingletonTypesTests {
 
     illTyped("""
       sameTyped(s13)(s23)
+    """)
+    illTyped("""
       sameTyped(s13)(23)
     """)
 
@@ -75,6 +102,8 @@ class SingletonTypesTests {
 
     illTyped("""
       sameTyped(sFoo)(sBar)
+    """)
+    illTyped("""
       sameTyped(sFoo)("bar")
     """)
 
@@ -86,8 +115,37 @@ class SingletonTypesTests {
 
     illTyped("""
       sameTyped(sFooSym)(sBarSym)
+    """)
+    illTyped("""
       sameTyped(sFooSym)('bar)
     """)
+
+    val sQuux = Quux.narrow
+    val sCorge = Corge.narrow
+
+    sameTyped(sQuux)(sQuux)
+    sameTyped(sQuux)(Quux)
+
+    illTyped("""
+      sameTyped(sQuux)(sCorge)
+    """)
+    illTyped("""
+      sameTyped(sQuux)(Corge)
+    """)
+
+    val sBaz = baz.narrow
+    val sQux = qux.narrow
+
+    sameTyped(sBaz)(sBaz)
+    sameTyped(sBaz)(baz)
+
+    illTyped("""
+      sameTyped(sBaz)(sQux)
+    """)
+    illTyped("""
+      sameTyped(sBaz)(qux)
+    """)
+
   }
 
   trait Show[T] {
@@ -104,6 +162,12 @@ class SingletonTypesTests {
 
     implicit val showFoo   = new Show[Foo] { def show = "'foo" }
     implicit val showBar   = new Show[Bar] { def show = "'bar" }
+
+    implicit val showQuux  = new Show[QuuxT] { def show = "Quux.type" }
+    implicit val showCorge = new Show[CorgeT] { def show = "Corge.type" }
+
+    implicit val showQux   = new Show[QuxT] { def show = "qux.type" }
+    implicit val showBaz   = new Show[BazT] { def show = "baz.type" }
   }
 
   def show[T](t: T)(implicit s: Show[T]) = s.show
@@ -134,6 +198,15 @@ class SingletonTypesTests {
 
     val sBar = show('bar.narrow)
     assertEquals("'bar", sBar)
+
+    val sQuux = show(Quux.narrow)
+    assertEquals("Quux.type", sQuux)
+
+    val sCorge = show(Corge.narrow)
+    assertEquals("Quux.type", sQuux)
+
+    val sBaz = show(baz.narrow)
+    assertEquals("baz.type", sBaz)
   }
 
   trait LiteralShow[T] {

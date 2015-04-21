@@ -224,6 +224,12 @@ class SingletonTypeMacros(val c: whitebox.Context) extends SingletonTypeUtils {
     mkWitness(tpe, value)
   }
 
+  def prefix(tpe: Type): Type = {
+    val global = c.universe.asInstanceOf[scala.tools.nsc.Global]
+    val gTpe = tpe.asInstanceOf[global.Type]
+    gTpe.prefix.asInstanceOf[Type]
+  }
+
   def extractResult[T](t: Expr[T])(mkResult: (Type, Tree) => Tree): Tree =
     (t.actualType, t.tree) match {
       case (tpe @ ConstantType(c: Constant), _) =>
@@ -231,6 +237,14 @@ class SingletonTypeMacros(val c: whitebox.Context) extends SingletonTypeUtils {
 
       case (tpe @ SingleType(p, v), tree) if !v.isParameter =>
         mkResult(tpe, tree)
+
+      case (tpe, tree) if (tree.symbol.isTerm &&
+                             tree.symbol.asTerm.isStable &&
+                             tree.tpe <:< typeOf[AnyRef]) => 
+        val pref = prefix(tree.tpe)
+        val st = singleType(pref, tree.symbol)
+        val ref = mkAttributedRef(pref, tree.symbol)
+        mkResult(st, ref)
 
       case (SymTpe, LiteralSymbol(s)) =>
         mkResult(SingletonSymbolType(s), mkSingletonSymbol(s))
